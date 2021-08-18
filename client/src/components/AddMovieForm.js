@@ -1,32 +1,24 @@
-import React, { useState, useEffect } from "react";
-import { useParams, useHistory } from "react-router-dom";
-import { Link } from "react-router-dom";
-
+import React, { useState } from "react";
+import { Link, useHistory } from "react-router-dom";
 import axios from "axios";
 
-const EditMovieForm = (props) => {
-  const { id } = useParams();
+function AddMovieForm(props) {
   const { push } = useHistory();
-  const [movie, setMovie] = useState({
+  const initialState = {
     title: "",
     director: "",
     genre: "",
-    metascore: 0,
+    metascore: "",
     description: "",
-  });
+  };
 
-  useEffect(() => {
-    axios
-      .get(`http://localhost:5000/api/movies/${id}`)
-      .then((res) => {
-        setMovie(res.data);
-      })
-      .catch((err) => console.log(err));
-  }, []);
+  const [currentMovie, setCurrentMovie] = useState(initialState);
+  const { title, director, genre, metascore, description } = currentMovie;
 
   const handleChange = (e) => {
-    setMovie({
-      ...movie,
+    console.log("change");
+    setCurrentMovie({
+      ...currentMovie,
       [e.target.name]: e.target.value,
     });
   };
@@ -34,24 +26,20 @@ const EditMovieForm = (props) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     axios
-      .put(`http://localhost:5000/api/movies/${id}`, movie)
+      .post("http://localhost:5000/api/movies/", currentMovie)
       .then((res) => {
         props.setMovies(res.data);
-        push(`/movies/${id}`);
+        push("/movies");
       })
       .catch((err) => console.log(err));
   };
-
-  const { title, director, genre, metascore, description } = movie;
 
   return (
     <div className="col">
       <div className="modal-content">
         <form onSubmit={handleSubmit}>
           <div className="modal-header">
-            <h4 className="modal-title">
-              Editing <strong>{movie.title}</strong>
-            </h4>
+            <h4 className="modal-title">Add Movie</h4>
           </div>
           <div className="modal-body">
             <div className="form-group">
@@ -119,6 +107,6 @@ const EditMovieForm = (props) => {
       </div>
     </div>
   );
-};
+}
 
-export default EditMovieForm;
+export default AddMovieForm;
